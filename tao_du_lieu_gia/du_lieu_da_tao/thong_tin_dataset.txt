@@ -1,0 +1,62 @@
+Dataset: Synthetic MoDANet-style DOA dataset
+
+Seed: 42
+
+Created: 2026-08-30 21:20:19
+
+Task:
+DOA classification
+
+Modulation:
+QPSK only
+
+DOA:
+min = -9 degree
+max = 9 degree
+step = 1 degree
+num_classes = 19
+
+SNR:
+min = -20 dB
+max = 5 dB
+step = 1 dB
+num_snr = 26
+
+Array:
+ULA
+num_antennas = 5
+spacing = lambda/2
+
+Signal:
+length = 1024 complex samples
+saved_shape = 1024 x 2 x 5
+saved_dtype = float32
+
+Sampling:
+Fs = 100 MHz
+Ts = 10 ns
+
+NLOS:
+number = Uniform integer [1,10]
+angle = Uniform [-60.0,60.0] degree
+attenuation = Uniform [-50.0,-1.0] dB
+delay = Uniform [1.0,3000.0] ns
+delay_method = integer sample rounding
+
+Samples per DOA-SNR pair:
+20
+
+Split per pair:
+train = 16
+validation = 2
+test = 2
+
+Total:
+train = 7904
+validation = 988
+test = 988
+all = 9880
+
+Important:
+Fs = 100 MHz is a custom simulation parameter,
+not a value claimed to come from the MoDANet paper.

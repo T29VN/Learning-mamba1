@@ -1,0 +1,9 @@
+tao_du_lieu_gia/du_lieu_da_tao/*.pt
+tao_du_lieu_gia/du_lieu_da_tao/metadata/
+tao_du_lieu_gia/du_lieu_da_tao/nhan/
+
+__pycache__/
+*.pyc
+venv/
+.venv/
+.vscode/
