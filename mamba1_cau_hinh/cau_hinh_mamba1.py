@@ -42,6 +42,12 @@ D_CONV = 4     # kernel size của local convolution
 EXPAND = 2     # hệ số mở rộng hidden dimension
 NUM_LAYERS = 3  # số Mamba-1 block nối tiếp nhau
 
+POOLING_TYPE = "mean"  # mean pooling theo chiều sequence
+DROPOUT = 0.0           # baseline hiện tại không sử dụng dropout
+USE_RESIDUAL = True     # residual connection quanh mỗi Mamba block
+NORM_POSITION = "pre"   # LayerNorm được áp dụng trước mỗi Mamba block
+USE_FINAL_NORM = True   # LayerNorm cuối trước bước pooling
+
 
 # ============================================================
 # 4. BÀI TOÁN DOA
