@@ -11,3 +11,6 @@ venv/
 # Model đã huấn luyện — không đưa checkpoint thật lên GitHub
 mo_hinh_da_huan_luyen/*.pt
 mo_hinh_da_huan_luyen/*.pth
+
+# Secrets
+.env
