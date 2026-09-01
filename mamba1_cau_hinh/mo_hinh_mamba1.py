@@ -22,12 +22,16 @@ class Mamba1DOAClassifier(nn.Module):
     def __init__(self):
         super().__init__()
 
+        # cái này để kiểm tra cho chắc chắn là đúng cấu hình không
+        # nếu sai thì sẽ báo lỗi ngay từ đầu
         if cfg.NORM_POSITION != "pre":
             raise ValueError(
                 "Mamba1DOAClassifier chỉ hỗ trợ NORM_POSITION='pre', "
                 f"nhưng nhận được {cfg.NORM_POSITION!r}."
             )
-
+        
+        # cái này để kiểm tra cho chắc chắn là đúng cấu hình không
+        # nếu sai thì sẽ báo lỗi ngay từ đầu
         if cfg.POOLING_TYPE != "mean":
             raise ValueError(
                 "Mamba1DOAClassifier chỉ hỗ trợ POOLING_TYPE='mean', "
@@ -46,7 +50,7 @@ class Mamba1DOAClassifier(nn.Module):
                     d_conv=cfg.D_CONV,
                     expand=cfg.EXPAND,
                 )
-                for _ in range(cfg.NUM_LAYERS)
+                for _ in range(cfg.NUM_LAYERS) # dùng for vì dưới dùng 3 khối mamba
             ]
         )
 
@@ -118,3 +122,5 @@ class Mamba1DOAClassifier(nn.Module):
             "logits": logits,
             "pooled_features": pooled_features,
         }
+
+
