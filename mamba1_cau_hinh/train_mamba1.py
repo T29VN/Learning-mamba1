@@ -511,7 +511,7 @@ def append_history(
 
 
 def validate_resume_history(path: Path, checkpoint_epoch: int) -> None:
-    """Đảm bảo history hiện tại kết thúc đúng tại epoch checkpoint."""
+    """Đồng bộ history với checkpoint, rollback tối đa một epoch dư."""
     with path.open("r", newline="", encoding="utf-8") as file:
         reader = csv.DictReader(file)
         if reader.fieldnames != list(HISTORY_FIELDS):
@@ -528,11 +528,66 @@ def validate_resume_history(path: Path, checkpoint_epoch: int) -> None:
     except (TypeError, ValueError) as exc:
         raise ValueError("Epoch cuối trong history.csv không hợp lệ.") from exc
 
-    if history_last_epoch != checkpoint_epoch:
-        raise ValueError(
-            f"Epoch cuối của history.csv là {history_last_epoch}, "
-            f"nhưng last checkpoint là epoch {checkpoint_epoch}."
+    if history_last_epoch == checkpoint_epoch:
+        return
+
+    if history_last_epoch == checkpoint_epoch + 1:
+        rows_without_extra_epoch = rows[:-1]
+        if not rows_without_extra_epoch:
+            raise ValueError(
+                "Không thể rollback history.csv vì sau khi bỏ dòng dư "
+                "không còn epoch nào để khớp checkpoint."
+            )
+
+        try:
+            rollback_epoch = int(rows_without_extra_epoch[-1]["epoch"])
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                "Epoch trước dòng dư trong history.csv không hợp lệ."
+            ) from exc
+
+        if rollback_epoch != checkpoint_epoch:
+            raise ValueError(
+                "History đi trước checkpoint một epoch nhưng dòng trước đó "
+                f"là epoch {rollback_epoch}, không khớp checkpoint epoch "
+                f"{checkpoint_epoch}."
+            )
+
+        with path.open("w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(file, fieldnames=HISTORY_FIELDS)
+            writer.writeheader()
+            writer.writerows(rows_without_extra_epoch)
+
+        with path.open("r", newline="", encoding="utf-8") as file:
+            synchronized_rows = list(csv.DictReader(file))
+        try:
+            synchronized_epoch = int(synchronized_rows[-1]["epoch"])
+        except (IndexError, KeyError, TypeError, ValueError) as exc:
+            raise RuntimeError(
+                "Không thể xác nhận epoch cuối của history.csv sau rollback."
+            ) from exc
+        if synchronized_epoch != checkpoint_epoch:
+            raise RuntimeError(
+                f"Rollback history.csv không thành công: epoch cuối là "
+                f"{synchronized_epoch}, expected {checkpoint_epoch}."
+            )
+
+        print(
+            "History was one epoch ahead of last checkpoint. "
+            f"Rolled history.csv back to epoch {checkpoint_epoch}."
         )
+        return
+
+    if history_last_epoch < checkpoint_epoch:
+        raise ValueError(
+            f"Epoch cuối của history.csv là {history_last_epoch}, thấp hơn "
+            f"last checkpoint epoch {checkpoint_epoch}."
+        )
+
+    raise ValueError(
+        f"Epoch cuối của history.csv là {history_last_epoch}, đi trước "
+        f"last checkpoint epoch {checkpoint_epoch} nhiều hơn một epoch."
+    )
 
 
 def build_checkpoint(
@@ -586,10 +641,10 @@ def load_resume_checkpoint(
         )
 
     last_epoch = int(checkpoint["epoch"])
-    if last_epoch >= cfg.EPOCHS:
+    if last_epoch > cfg.EPOCHS:
         raise ValueError(
-            f"Training đã đạt epoch {last_epoch}, bằng hoặc vượt "
-            f"EPOCHS={cfg.EPOCHS}; không có epoch nào để resume."
+            f"Last checkpoint ở epoch {last_epoch}, vượt quá "
+            f"EPOCHS={cfg.EPOCHS} của cấu hình hiện tại."
         )
 
     validate_resume_history(history_path, last_epoch)
@@ -837,10 +892,6 @@ def main() -> None:
             best_epoch,
         )
 
-        if is_best:
-            torch.save(checkpoint, output_paths["best_model"])
-
-        torch.save(checkpoint, output_paths["last_checkpoint"])
         append_history(
             output_paths["history"],
             epoch,
@@ -848,6 +899,11 @@ def main() -> None:
             val_metrics,
             learning_rate,
         )
+
+        if is_best:
+            torch.save(checkpoint, output_paths["best_model"])
+
+        torch.save(checkpoint, output_paths["last_checkpoint"])
 
         print(
             f"Epoch {epoch:02d}/{cfg.EPOCHS} | "
