@@ -53,7 +53,18 @@ USE_FINAL_NORM = True   # LayerNorm cuối trước bước pooling
 # 4. BÀI TOÁN DOA
 # ============================================================
 
+DOA_MIN_DEGREE = -9
+DOA_MAX_DEGREE = 9
+DOA_STEP_DEGREE = 1
 NUM_CLASSES = 19  # các góc DOA nguyên từ -9 đến 9 độ
+
+_EXPECTED_NUM_CLASSES = (
+    (DOA_MAX_DEGREE - DOA_MIN_DEGREE) // DOA_STEP_DEGREE + 1
+)
+if _EXPECTED_NUM_CLASSES != NUM_CLASSES:
+    raise ValueError(
+        "NUM_CLASSES không khớp với dải DOA và bước DOA đã cấu hình."
+    )
 
 
 # ============================================================
@@ -96,3 +107,4 @@ DROP_LAST = False
 
 USE_AMP = True
 GRAD_CLIP = None  # baseline hiện tại không gradient clipping
+RESUME_TRAINING = False
