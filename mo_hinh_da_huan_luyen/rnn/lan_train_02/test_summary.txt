@@ -1,0 +1,33 @@
+MODEL PARAMETER DEFINITION
+
+Một model parameter là một giá trị vô hướng
+nằm trong một tensor nn.Parameter.
+
+Buffers không được tính là model parameter.
+
+PARAMETER COUNT
+
+RNN layers: 4,980
+Pre-LayerNorms: 140
+Final LayerNorm: 60
+Classifier: 589
+Total parameters: 5,769
+Trainable parameters: 5,769
+
+PARAMETER COMPARISON
+
+Mamba-1 reference parameters: 5,509
+RNN parameters: 5,769
+Difference: +260
+Difference percent: +4.72 %
+
+TRAINING RESULT
+
+Best epoch: 27
+Best validation RMSE: 3.09841934 degree
+
+TEST RESULT
+
+Test loss: 2.07995087
+Test accuracy: 29.453441 %
+Test RMSE: 3.09564144 degree

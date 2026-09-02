@@ -351,7 +351,7 @@ def train_one_epoch(
     total_correct = 0
     total_samples = 0
 
-    progress = tqdm(loader, desc=f"Epoch {epoch}/{cfg.EPOCHS} - Train")
+    progress = tqdm(loader, desc=f"Epoch {epoch}/{cfg.EPOCHS} - Train", ncols=80, leave=False, colour="green")
     for signals, doa_class, _doa_degree, _snr_db in progress:
         signals = signals.to(device, non_blocking=use_pin_memory)
         doa_class = doa_class.to(device, non_blocking=use_pin_memory)
@@ -408,6 +408,9 @@ def evaluate(
         for signals, doa_class, doa_degree, _snr_db in tqdm(
             loader,
             desc=description,
+            ncols=80,
+            leave=False,
+            colour="green",
         ):
             signals = signals.to(device, non_blocking=use_pin_memory)
             doa_class = doa_class.to(device, non_blocking=use_pin_memory)
@@ -685,6 +688,9 @@ def evaluate_test(
         for signals, doa_class, doa_degree, snr_db in tqdm(
             loader,
             desc="Test",
+            ncols=80,
+            leave=False,
+            colour="green",
         ):
             signals = signals.to(device, non_blocking=use_pin_memory)
             doa_class = doa_class.to(device, non_blocking=use_pin_memory)
