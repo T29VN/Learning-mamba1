@@ -19,7 +19,7 @@ TRAIN_FILE = DATA_DIR / "train.pt"
 VAL_FILE = DATA_DIR / "val.pt"
 TEST_FILE = DATA_DIR / "test.pt"
 
-MODEL_SAVE_DIR = PROJECT_ROOT / "mo_hinh_da_huan_luyen"
+MODEL_SAVE_DIR = PROJECT_ROOT / "mo_hinh_da_huan_luyen" / "mamba1"
 
 
 # ============================================================
